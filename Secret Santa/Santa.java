@@ -11,18 +11,21 @@ class Santa
 		
 		//Scramble the people
 		String[] scrambled = ScrambleList.ScrambleContinuous(people);
-
+		CLS cls = new CLS(); 
 		Thread t;
 		for (String i: scrambled){
-			//Print a person
-			System.out.println(i);
-
-			//wait 3 seconds
 			try 
 			{
+				//Print a person
+				System.out.println(i);
+
+				//Wait 3 seconds
 				Thread.sleep(3000);
+
+				//Clear screen
+				cls.clear();
 			} 
-			catch(InterruptedException e)
+			catch(Exception e)
 			{
 				 // this part is executed when an exception (in this example InterruptedException) occurs
 			}
