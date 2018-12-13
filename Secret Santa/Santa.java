@@ -5,16 +5,19 @@ import java.lang.*;
 
 class Santa
 {
-	private boolean debug;
+	private static boolean debug;
+	private static boolean continousPeople;
 
 	public static void main(String args[])
 	{
-		//initialise command line read and clear, set debug mode.
+		//initialise read and screen clear; set debug mode.
 		debug = args.length > 0 && args[0].equals("debug");
 		Scanner scanner = new Scanner(System.in);
 		CLS cls = new CLS(); 
 		
-
+		//configure the program options
+		Configure(scanner);
+	
 		List<Person> people = new ArrayList<Person>();
 
 		if(debug)
@@ -24,13 +27,14 @@ class Santa
 			InputPeople(people, scanner);
 		}
 		
+		//need more than two people, or the output is self-evident
 		if(people.size() < 3){
 			System.out.println("You need at least three people for this to work. This program will now exit.");
 			scanner.nextLine();
 			return;
 		}
 
-		//clear screen
+		//clear screen as we have finished adding names
 		if(!debug){
 			try 
 			{
@@ -38,45 +42,56 @@ class Santa
 			}
 			catch(Exception e)
 			{
-				System.out.println("Something went wrong!");
+				System.out.println("Something went wrong while clearing the screen.");
 			}
 		}
 
-		//tell users who their target is
+		//scramble the people based on chosen scramble method
+		if(continousPeople)
+		{
+			ScrambleList.ScramblePeopleContinuous(people, debug);
+		} else {
+			ScrambleList.ScramblePeopleMicroLoops(people, debug);
+		}
+
+		//tell users who their target are
 		OutputUsers(people, scanner);
 			
 		try{
-
+			//final read to stop the window from auto-closing
 			System.in.read();
 		}
 		catch (Exception e){
-			System.out.println("Something went wrong!");
+			System.out.println("Something went wrong retrieving the recipient!");
 		}
 	}
 
-	//tell users who their target is
+	private static void Configure(Scanner scanner){
+		System.out.println("Do you want your players to be in a continuous loop? (y/n)");
+		continousPeople = scanner.nextLine().charAt(0) != 'n';
+	}
+
+	//tell each user who their target is
 	private static void OutputUsers(List<Person> people, Scanner scanner){
-	//Scramble the people
-		ScrambleList.ScramblePeopleContinuous(people, debug);
+		CLS cls = new CLS();
+		
 		Thread t;
 		
 		for (Person user: people){
 			try 
 			{
-				//Print a person
-				System.out.println("Hi " + user.name + "...");
+				//greet the next player and wait for confirmation to ensure the correct user is shown the target.
+				System.out.println("Hi " + user.name + ",");
 				
-				//Wait for confirmation from the user;
 				if (!debug)
 				{
-					System.out.println("Press enter to get your recipient...");				
+					System.out.println("Press enter to get your recipient.");				
 					scanner.nextLine();
 				}
 				
-				//Give them their target
+				//give them their target, then wait for them to respond before clearing the screen.
 				System.out.println("Your recipient is: " + user.target.name);
 				
-				//Wait for response then clear screen
 				if (!debug)
 				{
 					System.out.println("Press enter to clear the screen...");
@@ -86,7 +101,7 @@ class Santa
 			} 
 			catch(Exception e)
 			{
-				 System.out.println("Something went wrong!");
+				 System.out.println("Something went wrong while giving the player's their targets.");
 			}
 		}
 
@@ -101,7 +116,7 @@ class Santa
 		while (true){
 			String name = scanner.nextLine();
 			
-			// if input was not empty, add the person, otherwise we have finished adding people
+			//if input was not empty, add the person, otherwise we have finished adding people
 			if(name.length() > 0){
 				people.add(new Person(name));
 			}else{
@@ -110,7 +125,7 @@ class Santa
 		}
 	}
 
-	//test users
+	//hard-coded users for debug mode
 	private static void AddSamplePeople(List<Person> people){
 		people.add(new Person("Anna"));
 		people.add(new Person("Bob"));
